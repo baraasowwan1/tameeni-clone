@@ -26,7 +26,10 @@ function App() {
     images.forEach(image => formDataToSend.append('images', image));
 
     try {
-      const response = await axios.post('http://localhost:5000/api/customers/submit', formDataToSend, {
+      const response = await axios.post(
+  `${import.meta.env.VITE_API_URL}/api/customers/submit`,
+  formDataToSend,
+  {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setStatus('success');
