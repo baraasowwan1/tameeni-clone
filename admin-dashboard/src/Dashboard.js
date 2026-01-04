@@ -11,6 +11,9 @@ const Dashboard = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [adminNotes, setAdminNotes] = useState('');
 
+  // رابط الـ API من متغير البيئة
+  const API_URL = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -18,7 +21,7 @@ const Dashboard = () => {
   const fetchCustomers = async () => {
     const token = localStorage.getItem('adminToken');
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/customers', {
+      const res = await axios.get(`${API_URL}/api/admin/customers`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCustomers(res.data);
@@ -29,22 +32,30 @@ const Dashboard = () => {
 
   const handleApprove = async () => {
     const token = localStorage.getItem('adminToken');
-    await axios.put(`http://localhost:5000/api/admin/customers/${selectedCustomer._id}/approve`, 
-      { adminNotes }, 
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setOpen(false);
-    fetchCustomers();
+    try {
+      await axios.put(`${API_URL}/api/admin/customers/${selectedCustomer._id}/approve`,
+        { adminNotes },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setOpen(false);
+      fetchCustomers();
+    } catch (error) {
+      console.error('Failed to approve customer:', error);
+    }
   };
 
   const handleReject = async () => {
     const token = localStorage.getItem('adminToken');
-    await axios.put(`http://localhost:5000/api/admin/customers/${selectedCustomer._id}/reject`, 
-      { adminNotes }, 
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setOpen(false);
-    fetchCustomers();
+    try {
+      await axios.put(`${API_URL}/api/admin/customers/${selectedCustomer._id}/reject`,
+        { adminNotes },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setOpen(false);
+      fetchCustomers();
+    } catch (error) {
+      console.error('Failed to reject customer:', error);
+    }
   };
 
   const getStatusChip = (status) => {
@@ -81,18 +92,16 @@ const Dashboard = () => {
                   <TableCell>{new Date(customer.submittedAt).toLocaleDateString()}</TableCell>
                   <TableCell>
                     {customer.pageData.status === 'pending' && (
-                      <>
-                        <Button 
-                          size="small" 
-                          onClick={() => {
-                            setSelectedCustomer(customer);
-                            setAdminNotes('');
-                            setOpen(true);
-                          }}
-                        >
-                          Review
-                        </Button>
-                      </>
+                      <Button 
+                        size="small" 
+                        onClick={() => {
+                          setSelectedCustomer(customer);
+                          setAdminNotes('');
+                          setOpen(true);
+                        }}
+                      >
+                        Review
+                      </Button>
                     )}
                   </TableCell>
                 </TableRow>
@@ -115,7 +124,7 @@ const Dashboard = () => {
               <h3>{selectedCustomer?.pageData.title}</h3>
               <p>{selectedCustomer?.pageData.content}</p>
               {selectedCustomer?.pageData.images?.map((img, idx) => (
-                <img key={idx} src={`http://localhost:5000${img}`} alt="preview" style={{ maxWidth: '200px', margin: '10px' }} />
+                <img key={idx} src={`${API_URL}${img}`} alt="preview" style={{ maxWidth: '200px', margin: '10px' }} />
               ))}
             </div>
           </div>
