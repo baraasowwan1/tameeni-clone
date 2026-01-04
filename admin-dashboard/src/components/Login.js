@@ -13,17 +13,23 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // استخدم متغير بيئة للـ API
+  const API_URL = process.env.REACT_APP_API_URL || 'https://tameeni-clone.onrender.com';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const response = await axios.post('/api/auth/login', credentials);
+      // ربط الـ Admin بالـ Backend المنشور
+      const response = await axios.post(`${API_URL}/login`, credentials);
+
+      // تسجيل الدخول وحفظ التوكن
       login(response.data.token);
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid credentials');
+      setError('بيانات الدخول غير صحيحة'); // رسالة بالعربي
     } finally {
       setLoading(false);
     }
