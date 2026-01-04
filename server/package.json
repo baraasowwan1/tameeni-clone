@@ -1,3 +1,4 @@
+"start": "node index.js"
 {
   "name": "tameeni-backend",
   "scripts": {
